@@ -1,0 +1,26 @@
+Hi RudyRed,
+
+I was able to confirm that the board was designed to eliminate the use of I/O Space due to the problems which is brings.  With more and more peripherals sharing the same small amount of I/O space, it is common for the system to be unable to allocate the I/O Space needed by a resource.
+
+From your reference to AccessHW I assume that you are using LabVIEW as your programming environment?  If this is true, then I also assume you are using NI-VISA to access your serial hardware.  When using VISA in LabVIEW, the VISA Write function will not return until the last byte has been transferred to the serial board's hardware FIFO.  Once the data is in the hardware FIFO, it will be transferred out the port in a deterministic time.  Your application should be able to delay for a brief moment to ensure that the bytes in the FIFO have been transmitted.
+
+The calculate the maximum amount of time it can take for the last byte to leave the serial port the following equation can be used:
+
+(SizeOfTransmitFifo) * (SizeOfSerialFrame) / (BaudRate)
+
+The size of the transmit FIFO can be set through the Windows Device Manager, and the size of the serial frame depends on your data bits, stop bits, and parity settings.
+
+For Example: Using 115,200 Baud, 8 Data Bits, 1 Stop Bit, and no Parity, with a 64 byte Transmite Buffer:
+
+64 * 10 (Start bit + 8 data bits + stop bit) / 115,200 = 5.5ms
+
+ 
+
+I would highly recommend something of this manner in your application, so that you can continue to use the newer serial boards which you have purchased.  In addition to several performance enhancements, the lack of an I/O space dependency is only going to become more important in the future.  If this will not work for you, you could always work with your sales representative to see about exchanging these for the Legacy PCI boards, with which your existing application works.
+
+Please let me know if you have any more questions, or if I can help in any other way,
+
+Jason S.
+GPIB & Serial
+National Instruments
+
